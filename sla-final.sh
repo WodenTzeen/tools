@@ -90,7 +90,7 @@ function check_price
 	while true ; do
 		echo -n "Veuillez entrer prix de l'instance : " && read pci_price
 		
-		if [[ "$(echo $pci_price | grep -E "^[1-9]$")" ]]; then return 0
+		if [[ "$(echo $pci_price | grep -E "^[1-9]{1,3}$")" ]]; then return 0
 		else
 			echo "Mauvaise valeur, essayez encore."
 		fi
