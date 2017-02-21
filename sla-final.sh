@@ -9,7 +9,7 @@
 
 function banner
 {
-	echo -e "============ Calcul SLA ===========\n=    Dev by Woden     ver 1.0     =\n===================================\n"
+	echo -e "============ Calcul SLA ===========\n=    Dev by Woden     ver 1.0.4     =\n===================================\n"
 }
 
 function menu
