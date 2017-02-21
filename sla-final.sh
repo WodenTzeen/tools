@@ -46,7 +46,7 @@ function check_sla
 			"n" | "N" )
 				while true ; do
 					echo -n "Veuillez entrer le pourcentage de SLA : " && read value
-					if [[ "$(echo $value | grep "^[ [:digit:] ]*$")" ]]; then
+					if [[ "$(echo $value | grep "^[0-9]{1,3}$")" ]]; then
 						echo "Nouveau pourcentage : $value%"
 						return 0
 					else
@@ -69,13 +69,13 @@ function check_time
 	while true ; do
 		if [[ $choice -eq 1 ]] || [[ $choice -eq 2 ]]; then 
 			echo -n "Veuillez entrer le nombre d'heures d'indisponibilité : " && read temps
-			if [[ "$(echo $temps | grep -E "^[1-9]{1,2}$")" ]]; then return 0
+			if [[ "$(echo $temps | grep -E "^[0-9]{1,2}$")" ]]; then return 0
 			else
 				echo "Mauvaise valeur, essayez encore."
 			fi
 		elif [[ $choice -eq 3 ]]; then
 			echo -n "Veuillez entrer le nombre de minutes d'indisponibilité : " && read temps
-			if [[ "$(echo $temps | grep -E "^[1-9]{1,3}$")" ]]; then return 0
+			if [[ "$(echo $temps | grep -E "^[0-9]{1,3}$")" ]]; then return 0
 			else
 				echo "Mauvaise valeur, essayez encore."
 			fi
@@ -90,7 +90,7 @@ function check_price
 	while true ; do
 		echo -n "Veuillez entrer prix de l'instance : " && read pci_price
 		
-		if [[ "$(echo $pci_price | grep -E "^[1-9]{1,3}$")" ]]; then return 0
+		if [[ "$(echo $pci_price | grep -E "^[0-9]{1,3}$")" ]]; then return 0
 		else
 			echo "Mauvaise valeur, essayez encore."
 		fi
@@ -192,15 +192,12 @@ function sla_sd
 				fi
 				;;
 			3 )
-				echo 'Retour au menu précédent'
-				pause
 				choice=0
 				clear
 				return 1
 				;;
 			* )
 				echo 'Wrong choice ! Try again !'
-				pause
 				sd_choice=0
 				clear
 				;;
@@ -242,8 +239,8 @@ function sla_pci
 
 						#this is for a good display
 						tmp=$(echo "$result" | cut -d . -f1)
-						if [[ $tmp -ge 100 ]]; then result=$(echo "$result" | cut -c-6)
-						elif [[ $tmp -ge 10 ]] || [[ $tmp -lt 100 ]]; then result=$(echo "$result" | cut -c-5)
+						if [[ $tmp -ge 100 ]]; then result=$(echo "$result" | cut -c-6); fi
+						if [[ $tmp -ge 10 ]]; then result=$(echo "$result" | cut -c-5)
 						else result=$(echo "$result" | cut -c-4)
 						fi
 
@@ -274,16 +271,14 @@ function sla_pci
 
 						#this is for a good display
 						tmp=$(echo "$result" | cut -d . -f1)
-						if [[ $tmp -ge 100 ]]; then result=$(echo "$result" | cut -c-6)
-						elif [[ $tmp -ge 10 ]] || [[ $tmp -lt 100 ]]; then result=$(echo "$result" | cut -c-5)
+						if [[ $tmp -ge 100 ]]; then result=$(echo "$result" | cut -c-6); fi
+						if [[ $tmp -ge 10 ]]; then result=$(echo "$result" | cut -c-5)
 						else result=$(echo "$result" | cut -c-4)
 						fi
 
 						echo "Il faut créer un voucher de $result d'euros sur le projet client"
 					fi
 				fi
-
-				#pause
 
 				if yes_no; then
 					echo 'Okey ! ' | return 0
@@ -292,15 +287,12 @@ function sla_pci
 				fi
 				;;
 			3 )
-				echo 'Retour au menu précédent'
-				pause
 				choice=0
 				clear
 				return 1
 				;;
 			* )	
 				echo 'Wrong choice ! Try again !'
-				pause
 				pci_choice=0
 				clear
 				;;
