@@ -1,0 +1,1 @@
+This script is for made a distupgrdade from OS version x to x+1 (in that case : debian8 to debian9), list all pct currently running to run after the upgrade and upgrade to Proxmox4 to Proxmox5.
