@@ -1,0 +1,1 @@
+This script is for an OVH "internal" use to calculate the SLA's application on different product, nothing really specific, only to automate this operation
