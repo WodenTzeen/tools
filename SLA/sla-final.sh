@@ -46,7 +46,7 @@ function check_sla
 			"n" | "N" )
 				while true ; do
 					echo -n "Veuillez entrer le pourcentage de SLA : " && read value
-					if [[ "$(echo $value | grep "^[0-9]{1,3}$")" ]]; then
+					if [[ "$(echo $value | grep -E "^[0-9]{1,3}$")" ]]; then
 						echo "Nouveau pourcentage : $value%"
 						return 0
 					else
