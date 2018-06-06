@@ -1,0 +1,110 @@
+Algorythme projet : megaRaid_autoConf
+Language : bash
+
+Utilisation : permet la configuration automatique de carte MegaRaid sur un ou plusieurs serveur
+
+Exemple de config :
+
+MegaCli -CfgLDDel -L0 -a0 && MegaCli -CfgLdAdd -r1[encID:slot,encID:slot] -sz2000000 -a0 && MegaCli -CfgLdAdd -r1[encID:slot,encID:slot] -a0
+
+root@rescue:~# MegaCli -CfgLDDel -L0 -a0 && MegaCli -CfgLdAdd -r1[252:0,252:3] -sz2000000 -a0 && MegaCli -CfgLdAdd -r1[252:0,252:3] -a0 && MegaCli -LDInfo -Lall -aALL | egrep "Virtual|RAID|Size"
+
+Adapter 0: Deleted Virtual Drive-0(target id-0)
+
+Exit Code: 0x00
+
+Adapter 0: Created VD 0
+
+Adapter 0: Configured the Adapter!!
+
+Exit Code: 0x00
+
+Adapter 0: Created VD 1
+
+Adapter 0: Configured the Adapter!!
+
+Exit Code: 0x00
+Adapter 0 -- Virtual Drive Information:
+Virtual Drive: 0 (Target Id: 0)
+RAID Level          : Primary-1, Secondary-0, RAID Level Qualifier-0
+Size                : 1.907 TB
+Sector Size         : 512
+Strip Size          : 256 KB
+Virtual Drive: 1 (Target Id: 1)
+RAID Level          : Primary-1, Secondary-0, RAID Level Qualifier-0
+Size                : 1.730 TB
+Sector Size         : 512
+Strip Size          : 256 KB
+
+Récupération de l'enclosureID :  enclosur=$(MegaCli -PdList -aALL | grep "ID" | awk '{print $4}' | uniq)
+Récupération du slot : slot=$(MegaCli -PdList -aALL | grep "Slot" | awk '{print $3}'| uniq)
+
+
+	- listage des disques présent et configuration actuellement appliquée :
+		. demande du serveur et stocker dans $srv
+		. execution de la commande sur le/les serveurs stocké dans $srv
+			
+			> 	for i in (echo $srv); do 
+					ssh@srv
+					echo -e "$i\n############\n"
+					MegaCli -PdList -aALL | egrep "Slot|Device ID"
+					MegaCli -LDInfo -Lall -aALL | egrep "Virtual|RAID|Size"; 
+				done
+			
+	- création de RAID
+		. demande du serveur et stocker dans $srv
+		. demande du niveau de raid souhaité et stocker dans $raidLevel
+		. listage des disques présents
+			> 	for i in (echo $srv); do 
+					ssh@srv
+					echo -e "$i\n############\n"
+					MegaCli -PdList -aALL | egrep "Slot|Device ID"; 
+				done
+		
+		. demande des différentes informations sur l'enclosure et disques et renseigner dans variables $enclosur et $slot
+			si plusieurs enclosur : > nbrEnclosur=$(echo $enclosur | wc -l | tail -1)
+		
+		. demande le nombre de VD ainsi que la taille (en Mo): $nbrVd - $vdSize
+		. création du raid
+			si $nbrVd = 1 :
+			> 	for i in (echo $srv); do 
+					ssh@$srv
+					echo -e "$i\n############\n"
+					MegaCli -CfgLdAdd -r$raidLevel[$enclosur:$slot1,$enclosur:$slot2] -a0
+				done
+			
+			sinon :
+			> 	for i in (echo $srv); do
+					ssh@$srv
+					for i in seq (1 $nbrVd); do 
+						if [ $i eq $nbrVd]; then 
+							MegaCli -CfgLdAdd -r$raidLevel[$enclosur:$slot1,$enclosur:$slot2] -a0 
+							else MegaCli -CfgLdAdd -r$raidLevel[$enclosur:$slot1,$enclosur:$slot2] -sz$vdSize -a0
+						fi
+					done
+				done
+			
+			Puis affichage de la configuration : 
+			> 	for i in (echo $srv); do
+					ssh@$srv
+					MegaCli -LDInfo -Lall -aALL | egrep "Virtual|RAID|Size"
+				done
+					
+			
+	- suppression de RAID
+		. demande du/des serveurs et stocker dans $srv
+		. listage des VD présent :
+			
+			> 	for i in (echo $srv); do 
+					ssh@$srv
+					echo -e "$i\n############\n"
+					MegaCli -LDInfo -Lall -aALL | grep Virtual | awk '{print $3}' | uniq
+				done
+			
+		. execution de la commande : 
+			
+			> 	for i in (echo $srv); do 
+					ssh@$srv
+					echo -e "$i\n############\n"
+					MegaCli -CfgLDDel -L0 -a0
+				done
