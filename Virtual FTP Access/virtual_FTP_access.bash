@@ -8,6 +8,7 @@
 
 # Packet needed :
 # db6.0-util
+# vsftpd
 
 # == Auxilary function ==
 
